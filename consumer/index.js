@@ -2,15 +2,13 @@ const express = require("express");
 const amqp = require("amqplib");
 
 const app = express();
+
 const PORT = process.env.PORT || 3000;
-
-app.use(express.json());
-
-const queue = "hello";
+const queue = process.env.QUEUE;
 
 (async () => {
   try {
-    const connection = await amqp.connect("amqp://localhost");
+    const connection = await amqp.connect(process.env.RABBITMQ_HOST);
     const channel = await connection.createChannel();
 
     process.once("SIGINT", async () => {
@@ -28,16 +26,8 @@ const queue = "hello";
     );
 
     console.log(" [*] Waiting for messages. To exit press CTRL+C");
-  } catch (err) {
-    console.warn(err);
-  }
+  } catch (err) {}
 })();
-
-app.post("/", async (req, res) => {
-  const conn = await amqplib.connect("amqp://localhost");
-
-  res.send({ message: "POST request received." });
-});
 
 app.listen(PORT, () => {
   console.log(`Consumer service running on Port: ${PORT}.`);
