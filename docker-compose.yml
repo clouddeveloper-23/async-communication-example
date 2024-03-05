@@ -1,7 +1,7 @@
 version: "3.9"
 
 networks:
-  my-network:
+  async-network:
 
 volumes:
   rabbitdb:
@@ -12,10 +12,10 @@ services:
     container_name: rabbitmq
     hostname: rabbitmq
     networks:
-      - my-network
+      - async-network
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - 5672:5672
+      - 15672:15672
     volumes:
       - rabbitdb:/var/lib/rabbitmq
     environment:
@@ -26,22 +26,20 @@ services:
     container_name: producer
     hostname: producer
     networks:
-      - my-network
+      - async-network
     ports:
-      - "3002:3000"
+      - 3002:3000
     environment:
       - RABBITMQ_HOST=amqp://user:password@rabbitmq:5672
       - QUEUE=hello
-    depends_on:
-      - rabbitmq
   consumer:
     build: ./consumer
     container_name: consumer
     hostname: consumer
     networks:
-      - my-network
+      - async-network
     ports:
-      - "3001:3000"
+      - 3001:3000
     environment:
       - RABBITMQ_HOST=amqp://user:password@rabbitmq:5672
       - QUEUE=hello
